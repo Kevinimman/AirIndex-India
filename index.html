@@ -1,0 +1,3327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AirIndex India | Real-Time Airfare Price Index</title>
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#050505;
+    color:#f5f5f5;
+    overflow-x:hidden;
+}
+
+:root{
+    --black:#050505;
+    --panel:#0d0d0d;
+    --panel2:#121212;
+    --gold:#d4af37;
+    --gold2:#f4d76b;
+    --gold3:#806317;
+    --white:#f5f5f5;
+    --muted:#777;
+    --green:#69c58a;
+    --red:#dc6666;
+    --border:rgba(212,175,55,.18);
+}
+
+::-webkit-scrollbar{
+    width:7px;
+}
+
+::-webkit-scrollbar-track{
+    background:#050505;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#6d5619;
+    border-radius:10px;
+}
+
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+.bg-glow{
+    position:fixed;
+    width:600px;
+    height:600px;
+    right:-250px;
+    top:-250px;
+    background:radial-gradient(
+        circle,
+        rgba(212,175,55,.09),
+        transparent 65%
+    );
+    pointer-events:none;
+    z-index:-1;
+}
+
+.bg-glow2{
+    position:fixed;
+    width:500px;
+    height:500px;
+    left:-200px;
+    bottom:-250px;
+    background:radial-gradient(
+        circle,
+        rgba(212,175,55,.05),
+        transparent 65%
+    );
+    pointer-events:none;
+    z-index:-1;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    width:245px;
+    background:linear-gradient(
+        180deg,
+        #0c0c0c,
+        #050505
+    );
+    border-right:1px solid var(--border);
+    padding:25px 18px;
+    z-index:1000;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:28px;
+}
+
+.logo-box{
+    width:46px;
+    height:46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    background:linear-gradient(
+        135deg,
+        var(--gold2),
+        var(--gold),
+        var(--gold3)
+    );
+    color:#000;
+    font-size:15px;
+    font-weight:900;
+    box-shadow:0 0 30px rgba(212,175,55,.2);
+}
+
+.logo h2{
+    font-size:19px;
+}
+
+.logo small{
+    display:block;
+    margin-top:3px;
+    color:var(--gold);
+    font-size:8px;
+    letter-spacing:4px;
+}
+
+.system-status{
+    border:1px solid var(--border);
+    padding:10px;
+    border-radius:6px;
+    color:#888;
+    font-size:9px;
+    letter-spacing:1px;
+    margin-bottom:25px;
+}
+
+.status-dot{
+    display:inline-block;
+    width:7px;
+    height:7px;
+    margin-right:7px;
+    border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 12px var(--gold);
+}
+
+.nav-title{
+    color:#444;
+    font-size:8px;
+    letter-spacing:2px;
+    margin:20px 10px 8px;
+}
+
+.nav a{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px;
+    margin-bottom:3px;
+    border-radius:6px;
+    color:#777;
+    text-decoration:none;
+    font-size:10px;
+    transition:.3s;
+}
+
+.nav a:hover{
+    color:var(--gold2);
+    background:rgba(212,175,55,.05);
+    transform:translateX(3px);
+}
+
+.nav a.active{
+    color:var(--gold2);
+    border-left:2px solid var(--gold);
+    background:linear-gradient(
+        90deg,
+        rgba(212,175,55,.14),
+        transparent
+    );
+}
+
+.nav-icon{
+    width:20px;
+    text-align:center;
+    color:var(--gold);
+    font-size:14px;
+}
+
+.sidebar-footer{
+    position:absolute;
+    left:18px;
+    right:18px;
+    bottom:20px;
+    border-top:1px solid #222;
+    padding-top:15px;
+}
+
+.sidebar-footer small{
+    display:block;
+    color:#444;
+    font-size:7px;
+    letter-spacing:1px;
+}
+
+.sidebar-footer strong{
+    color:#999;
+    font-size:10px;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main{
+    margin-left:245px;
+    padding:0 35px 60px;
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.topbar{
+    height:88px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--border);
+}
+
+.breadcrumb{
+    color:#4d4d4d;
+    font-size:8px;
+    letter-spacing:2px;
+    margin-bottom:8px;
+}
+
+.topbar h1{
+    font-size:20px;
+}
+
+.top-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.live-badge{
+    border:1px solid var(--border);
+    background:rgba(212,175,55,.04);
+    color:var(--gold2);
+    padding:8px 12px;
+    border-radius:5px;
+    font-size:8px;
+    letter-spacing:1px;
+}
+
+.refresh-btn{
+    border:1px solid #333;
+    background:#0c0c0c;
+    color:#aaa;
+    padding:8px 13px;
+    border-radius:5px;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.refresh-btn:hover{
+    border-color:var(--gold);
+    color:var(--gold2);
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+    position:relative;
+    min-height:390px;
+    margin-top:25px;
+    padding:40px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 75% 50%,
+            rgba(212,175,55,.13),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #111,
+            #060606
+        );
+}
+
+.hero-content{
+    position:relative;
+    z-index:5;
+    max-width:620px;
+}
+
+.hero-label{
+    color:var(--gold);
+    font-size:9px;
+    font-weight:bold;
+    letter-spacing:2px;
+}
+
+.hero h2{
+    font-size:44px;
+    line-height:1.1;
+    margin:15px 0;
+}
+
+.hero h2 span{
+    color:var(--gold2);
+}
+
+.hero p{
+    color:#777;
+    font-size:11px;
+    line-height:1.8;
+    max-width:560px;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:25px;
+}
+
+.gold-btn{
+    padding:12px 18px;
+    border:none;
+    border-radius:5px;
+    background:linear-gradient(
+        135deg,
+        var(--gold2),
+        var(--gold)
+    );
+    color:#050505;
+    font-size:10px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.gold-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 30px rgba(212,175,55,.2);
+}
+
+.dark-btn{
+    padding:12px 18px;
+    border:1px solid #333;
+    border-radius:5px;
+    background:transparent;
+    color:#aaa;
+    font-size:10px;
+    cursor:pointer;
+}
+
+.dark-btn:hover{
+    border-color:var(--gold);
+    color:var(--gold2);
+}
+
+
+/* =========================================================
+   FLIGHT ANIMATION
+========================================================= */
+
+.flight-path{
+    position:absolute;
+    right:25px;
+    top:55px;
+    width:520px;
+    height:250px;
+    opacity:.6;
+}
+
+.flight-path svg{
+    width:100%;
+    height:100%;
+}
+
+.path-line{
+    fill:none;
+    stroke:var(--gold);
+    stroke-width:1.5;
+    stroke-dasharray:7 7;
+    opacity:.45;
+    animation:dash 5s linear infinite;
+}
+
+@keyframes dash{
+    to{
+        stroke-dashoffset:-100;
+    }
+}
+
+.plane{
+    position:absolute;
+    right:80px;
+    top:160px;
+    font-size:25px;
+    filter:drop-shadow(
+        0 0 10px rgba(212,175,55,.7)
+    );
+    animation:planeFly 7s ease-in-out infinite;
+}
+
+@keyframes planeFly{
+
+    0%{
+        transform:translate(-250px,100px) rotate(-18deg);
+    }
+
+    50%{
+        transform:translate(0,-40px) rotate(-12deg);
+    }
+
+    100%{
+        transform:translate(250px,70px) rotate(-18deg);
+    }
+}
+
+.runway{
+    position:absolute;
+    right:-100px;
+    bottom:35px;
+    width:600px;
+    height:2px;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        var(--gold),
+        transparent
+    );
+    opacity:.25;
+    transform:rotate(-10deg);
+}
+
+
+/* =========================================================
+   HERO INDEX
+========================================================= */
+
+.hero-index{
+    position:absolute;
+    right:45px;
+    bottom:45px;
+    text-align:right;
+    z-index:5;
+}
+
+.hero-index small{
+    color:#555;
+    font-size:8px;
+    letter-spacing:2px;
+}
+
+.big-index{
+    font-size:62px;
+    font-weight:900;
+    background:linear-gradient(
+        180deg,
+        #fff,
+        var(--gold2)
+    );
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    transition:.5s;
+}
+
+.index-change{
+    color:var(--gold);
+    font-size:11px;
+}
+
+
+/* =========================================================
+   KPI
+========================================================= */
+
+.kpis{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+    margin-top:13px;
+}
+
+.kpi{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(
+        145deg,
+        #121212,
+        #090909
+    );
+    border:1px solid var(--border);
+    padding:19px;
+    border-radius:8px;
+    transition:.35s;
+}
+
+.kpi:hover{
+    transform:translateY(-6px);
+    border-color:rgba(212,175,55,.5);
+}
+
+.kpi-label{
+    color:#555;
+    font-size:7px;
+    letter-spacing:1.5px;
+}
+
+.kpi-value{
+    color:var(--gold2);
+    font-size:25px;
+    font-weight:bold;
+    margin:9px 0 4px;
+}
+
+.kpi-sub{
+    color:#555;
+    font-size:8px;
+}
+
+
+/* =========================================================
+   GENERAL CARDS
+========================================================= */
+
+.section{
+    margin-top:14px;
+}
+
+.grid-2{
+    display:grid;
+    grid-template-columns:1.4fr 1fr;
+    gap:14px;
+}
+
+.card{
+    background:linear-gradient(
+        145deg,
+        #101010,
+        #090909
+    );
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:22px;
+    transition:.3s;
+}
+
+.card:hover{
+    border-color:rgba(212,175,55,.32);
+}
+
+.card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.label{
+    color:var(--gold);
+    font-size:7px;
+    font-weight:bold;
+    letter-spacing:2px;
+}
+
+.card h3{
+    font-size:15px;
+    margin-top:7px;
+}
+
+.period{
+    color:#777;
+    border:1px solid #333;
+    padding:6px 9px;
+    border-radius:4px;
+    font-size:7px;
+}
+
+
+/* =========================================================
+   INDEX
+========================================================= */
+
+.index-card{
+    min-height:310px;
+}
+
+.index-main{
+    display:flex;
+    align-items:center;
+    gap:30px;
+    margin-top:30px;
+}
+
+.circular-index{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+
+    background:conic-gradient(
+        var(--gold) 0 72%,
+        #252525 72% 100%
+    );
+
+    animation:rotateSlow 10s linear infinite;
+}
+
+.circular-index:before{
+    content:"";
+    position:absolute;
+    width:145px;
+    height:145px;
+    background:#0d0d0d;
+    border-radius:50%;
+}
+
+.circular-content{
+    position:relative;
+    text-align:center;
+}
+
+.circular-content strong{
+    display:block;
+    color:var(--gold2);
+    font-size:30px;
+}
+
+.circular-content span{
+    color:#555;
+    font-size:7px;
+    letter-spacing:1px;
+}
+
+@keyframes rotateSlow{
+    from{transform:rotate(0deg)}
+    to{transform:rotate(360deg)}
+}
+
+.index-details{
+    flex:1;
+}
+
+.detail-row{
+    display:flex;
+    justify-content:space-between;
+    padding:11px 0;
+    border-bottom:1px solid #202020;
+    font-size:9px;
+}
+
+.detail-row span:first-child{
+    color:#555;
+}
+
+.detail-row span:last-child{
+    color:#aaa;
+}
+
+.gold-text{
+    color:var(--gold2)!important;
+}
+
+
+/* =========================================================
+   CHART
+========================================================= */
+
+.chart{
+    height:250px;
+    margin-top:25px;
+    position:relative;
+    border-left:1px solid #242424;
+    border-bottom:1px solid #242424;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0 49px,
+            rgba(212,175,55,.05) 50px
+        );
+}
+
+.chart svg{
+    width:100%;
+    height:100%;
+}
+
+.chart-labels{
+    display:flex;
+    justify-content:space-between;
+    color:#444;
+    font-size:7px;
+    margin-top:8px;
+}
+
+
+/* =========================================================
+   MONTHLY
+========================================================= */
+
+.monthly-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:18px;
+}
+
+.month{
+    width:45px;
+    color:#666;
+    font-size:8px;
+}
+
+.month-bar{
+    flex:1;
+    height:7px;
+    background:#202020;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.month-bar div{
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        var(--gold3),
+        var(--gold2)
+    );
+    transform-origin:left;
+    animation:grow 1.3s ease forwards;
+}
+
+@keyframes grow{
+    from{transform:scaleX(0)}
+    to{transform:scaleX(1)}
+}
+
+.month-value{
+    width:50px;
+    text-align:right;
+    color:#aaa;
+    font-size:8px;
+}
+
+
+/* =========================================================
+   ROUTES
+========================================================= */
+
+.route-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-top:20px;
+}
+
+.route{
+    padding:16px;
+    background:#0c0c0c;
+    border:1px solid #242424;
+    border-radius:7px;
+    transition:.3s;
+    position:relative;
+    overflow:hidden;
+}
+
+.route:hover{
+    transform:translateY(-5px);
+    border-color:var(--gold3);
+}
+
+.route:after{
+    content:"✈";
+    position:absolute;
+    right:-25px;
+    bottom:-12px;
+    font-size:55px;
+    color:rgba(212,175,55,.035);
+    transform:rotate(-20deg);
+    transition:.3s;
+}
+
+.route:hover:after{
+    right:5px;
+    bottom:2px;
+    color:rgba(212,175,55,.1);
+}
+
+.route-top{
+    display:flex;
+    justify-content:space-between;
+}
+
+.route-name{
+    color:#eee;
+    font-weight:bold;
+    font-size:10px;
+}
+
+.up{
+    color:var(--gold2);
+    font-size:8px;
+}
+
+.down{
+    color:var(--green);
+    font-size:8px;
+}
+
+.route-city{
+    color:#555;
+    font-size:8px;
+    margin:7px 0 15px;
+}
+
+.route-price{
+    color:var(--gold2);
+    font-size:20px;
+    font-weight:bold;
+}
+
+.route-bottom{
+    display:flex;
+    justify-content:space-between;
+    margin-top:12px;
+    padding-top:9px;
+    border-top:1px solid #202020;
+    color:#555;
+    font-size:7px;
+}
+
+
+/* =========================================================
+   AIRLINES
+========================================================= */
+
+.airline-row{
+    display:grid;
+    grid-template-columns:120px 1fr 70px;
+    gap:10px;
+    align-items:center;
+    margin-top:18px;
+}
+
+.airline-name{
+    color:#aaa;
+    font-size:9px;
+}
+
+.airline-track{
+    height:6px;
+    background:#202020;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.airline-fill{
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        var(--gold3),
+        var(--gold2)
+    );
+    animation:slideWidth 1.4s ease;
+}
+
+@keyframes slideWidth{
+    from{width:0!important}
+}
+
+.airline-price{
+    color:var(--gold2);
+    text-align:right;
+    font-size:8px;
+}
+
+
+/* =========================================================
+   LEAD TIME
+========================================================= */
+
+.lead-chart{
+    height:200px;
+    margin-top:30px;
+    display:flex;
+    align-items:end;
+    justify-content:space-around;
+    border-bottom:1px solid #292929;
+}
+
+.lead-column{
+    width:13%;
+    height:100%;
+    display:flex;
+    align-items:end;
+    justify-content:center;
+    position:relative;
+}
+
+.lead-bar{
+    width:55%;
+    background:linear-gradient(
+        to top,
+        var(--gold3),
+        var(--gold2)
+    );
+    border-radius:3px 3px 0 0;
+    position:relative;
+    animation:barRise 1.2s ease;
+}
+
+@keyframes barRise{
+    from{height:0!important}
+}
+
+.lead-bar strong{
+    position:absolute;
+    top:-20px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#aaa;
+    white-space:nowrap;
+    font-size:7px;
+}
+
+.lead-column span{
+    position:absolute;
+    bottom:-25px;
+    color:#555;
+    font-size:7px;
+}
+
+
+/* =========================================================
+   HEATMAP
+========================================================= */
+
+.heatmap{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:5px;
+    margin-top:20px;
+}
+
+.heat{
+    height:42px;
+    border-radius:4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:7px;
+    color:#bbb;
+    transition:.3s;
+}
+
+.heat:hover{
+    transform:scale(1.08);
+    border:1px solid var(--gold);
+}
+
+.h1{background:#18160e}
+.h2{background:#29230e}
+.h3{background:#41350f}
+.h4{background:#665217}
+.h5{background:#8c711e}
+.h6{
+    background:#b8942b;
+    color:#111;
+}
+
+
+/* =========================================================
+   PIPELINE
+========================================================= */
+
+.pipeline{
+    margin-top:22px;
+}
+
+.pipeline-item{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-top:16px;
+}
+
+.pipeline-number{
+    width:34px;
+    height:34px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--gold3);
+    border-radius:50%;
+    color:var(--gold);
+    font-size:8px;
+}
+
+.pipeline-text{
+    flex:1;
+}
+
+.pipeline-text strong{
+    font-size:9px;
+}
+
+.pipeline-text p{
+    color:#555;
+    font-size:7px;
+    margin-top:4px;
+}
+
+.pipeline-status{
+    color:var(--gold2);
+    font-size:8px;
+}
+
+.pipeline-line{
+    height:17px;
+    width:1px;
+    background:#3b3015;
+    margin-left:17px;
+}
+
+
+/* =========================================================
+   OTA LOGOS
+========================================================= */
+
+.source-description{
+    color:#555;
+    font-size:8px;
+    line-height:1.7;
+    margin-top:8px;
+    max-width:650px;
+}
+
+.ota-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:22px;
+}
+
+.ota-card{
+    position:relative;
+    min-height:145px;
+    padding:22px;
+    background:#0a0a0a;
+    border:1px solid #252525;
+    border-radius:9px;
+    overflow:hidden;
+    cursor:pointer;
+
+    transition:
+        transform .35s ease,
+        border-color .35s ease,
+        background .35s ease,
+        box-shadow .35s ease;
+}
+
+.ota-card:hover{
+    transform:translateY(-7px) scale(1.015);
+    background:#111;
+}
+
+.ota-logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    color:#777;
+
+    filter:
+        grayscale(1)
+        brightness(.75);
+
+    transition:
+        color .35s ease,
+        filter .35s ease,
+        transform .35s ease;
+}
+
+.ota-card:hover .ota-logo{
+    filter:grayscale(0) brightness(1);
+    transform:translateX(3px);
+}
+
+.ota-logo span{
+    font-size:16px;
+    font-weight:800;
+}
+
+.mmt-icon,
+.yatra-icon,
+.emt-icon,
+.cleartrip-icon,
+.ixigo-icon,
+.goibibo-icon{
+    width:45px;
+    height:45px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+
+    border-radius:10px;
+
+    background:#242424;
+
+    color:#888;
+
+    transition:.35s;
+}
+
+
+/* MakeMyTrip */
+
+.makemytrip:hover{
+    border-color:#e51b23;
+    box-shadow:0 0 25px rgba(229,27,35,.1);
+}
+
+.mmt-icon{
+    font-size:11px;
+    letter-spacing:-1px;
+}
+
+.makemytrip:hover .mmt-icon{
+    background:#e51b23;
+    color:white;
+    box-shadow:0 0 20px rgba(229,27,35,.35);
+}
+
+
+/* Yatra */
+
+.yatra:hover{
+    border-color:#e31b2f;
+    box-shadow:0 0 25px rgba(227,27,47,.1);
+}
+
+.yatra-icon{
+    font-size:25px;
+    font-family:Georgia,serif;
+    font-style:italic;
+}
+
+.yatra:hover .yatra-icon{
+    background:#e31b2f;
+    color:white;
+    box-shadow:0 0 20px rgba(227,27,47,.35);
+}
+
+
+/* EaseMyTrip */
+
+.easemytrip:hover{
+    border-color:#f36f21;
+    box-shadow:0 0 25px rgba(243,111,33,.1);
+}
+
+.emt-icon{
+    font-size:22px;
+}
+
+.easemytrip:hover .emt-icon{
+    background:#f36f21;
+    color:white;
+    box-shadow:0 0 20px rgba(243,111,33,.35);
+}
+
+
+/* Cleartrip */
+
+.cleartrip:hover{
+    border-color:#00a7a0;
+    box-shadow:0 0 25px rgba(0,167,160,.1);
+}
+
+.cleartrip-icon{
+    font-size:25px;
+}
+
+.cleartrip:hover .cleartrip-icon{
+    background:#00a7a0;
+    color:white;
+    box-shadow:0 0 20px rgba(0,167,160,.35);
+}
+
+
+/* ixigo */
+
+.ixigo:hover{
+    border-color:#f36b21;
+    box-shadow:0 0 25px rgba(243,107,33,.1);
+}
+
+.ixigo-icon{
+    font-size:19px;
+}
+
+.ixigo:hover .ixigo-icon{
+    background:#f36b21;
+    color:white;
+    box-shadow:0 0 20px rgba(243,107,33,.35);
+}
+
+
+/* Goibibo */
+
+.goibibo:hover{
+    border-color:#f4511e;
+    box-shadow:0 0 25px rgba(244,81,30,.1);
+}
+
+.goibibo-icon{
+    font-size:18px;
+}
+
+.goibibo:hover .goibibo-icon{
+    background:#f4511e;
+    color:white;
+    box-shadow:0 0 20px rgba(244,81,30,.35);
+}
+
+
+.ota-type{
+    position:absolute;
+    left:22px;
+    bottom:22px;
+    color:#444;
+    font-size:7px;
+    letter-spacing:1.5px;
+}
+
+.ota-status{
+    position:absolute;
+    right:20px;
+    bottom:21px;
+    color:#3f3f3f;
+    font-size:7px;
+}
+
+.ota-card:hover .ota-status{
+    color:#aaa;
+}
+
+
+/* =========================================================
+   METHODOLOGY
+========================================================= */
+
+.method-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+    margin-top:20px;
+}
+
+.method{
+    padding:18px;
+    background:#0b0b0b;
+    border:1px solid #242424;
+    border-radius:7px;
+    transition:.3s;
+}
+
+.method:hover{
+    transform:translateY(-5px);
+    border-color:var(--gold3);
+}
+
+.method-num{
+    color:var(--gold);
+    font-size:19px;
+    font-weight:bold;
+}
+
+.method h4{
+    font-size:10px;
+    margin:10px 0 7px;
+}
+
+.method p{
+    color:#555;
+    font-size:7px;
+    line-height:1.7;
+}
+
+
+/* =========================================================
+   API
+========================================================= */
+
+.api{
+    background:#050505;
+    border:1px solid #292929;
+    border-radius:6px;
+    padding:20px;
+    margin-top:20px;
+    font-family:monospace;
+    font-size:9px;
+    line-height:2;
+    color:#888;
+}
+
+.api-method{
+    color:var(--gold2);
+}
+
+.api-key{
+    color:#c9a940;
+}
+
+.api-value{
+    color:#aaa;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+    margin-top:25px;
+    padding:25px 0;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    color:#444;
+    font-size:7px;
+}
+
+.footer strong{
+    color:var(--gold3);
+}
+
+
+/* =========================================================
+   REVEAL
+========================================================= */
+
+.reveal{
+    opacity:0;
+    transform:translateY(25px);
+    transition:
+        opacity .8s ease,
+        transform .8s ease;
+}
+
+.reveal.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1200px){
+
+    .kpis{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .route-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .method-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+}
+
+@media(max-width:950px){
+
+    .sidebar{
+        width:70px;
+        padding:20px 8px;
+    }
+
+    .logo h2,
+    .logo small,
+    .system-status,
+    .nav-title,
+    .sidebar-footer{
+        display:none;
+    }
+
+    .logo{
+        justify-content:center;
+    }
+
+    .nav a{
+        justify-content:center;
+    }
+
+    .nav a span:last-child{
+        display:none;
+    }
+
+    .main{
+        margin-left:70px;
+    }
+
+    .grid-2{
+        grid-template-columns:1fr;
+    }
+
+    .ota-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:700px){
+
+    .main{
+        padding:0 15px 40px;
+    }
+
+    .top-actions{
+        display:none;
+    }
+
+    .hero{
+        padding:25px;
+        min-height:520px;
+    }
+
+    .hero h2{
+        font-size:30px;
+    }
+
+    .flight-path{
+        opacity:.2;
+        right:-150px;
+    }
+
+    .hero-index{
+        position:relative;
+        right:auto;
+        bottom:auto;
+        margin-top:35px;
+        text-align:left;
+    }
+
+    .kpis{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .route-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .method-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:500px){
+
+    .kpis,
+    .route-grid,
+    .method-grid,
+    .ota-grid{
+        grid-template-columns:1fr;
+    }
+
+    .index-main{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .footer{
+        flex-direction:column;
+        gap:10px;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-glow2"></div>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-box">
+            AI
+        </div>
+
+        <div>
+            <h2>AirIndex</h2>
+            <small>INDIA</small>
+        </div>
+
+    </div>
+
+
+    <div class="system-status">
+        <span class="status-dot"></span>
+        DATA SYSTEM ACTIVE
+    </div>
+
+
+    <div class="nav-title">
+        INDEX
+    </div>
+
+    <nav class="nav">
+
+        <a href="#dashboard" class="active">
+            <span class="nav-icon">◈</span>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="#index">
+            <span class="nav-icon">⌁</span>
+            <span>Airfare Index</span>
+        </a>
+
+        <a href="#routes">
+            <span class="nav-icon">✈</span>
+            <span>Routes</span>
+        </a>
+
+        <a href="#airlines">
+            <span class="nav-icon">◇</span>
+            <span>Airlines</span>
+        </a>
+
+    </nav>
+
+
+    <div class="nav-title">
+        ANALYTICS
+    </div>
+
+    <nav class="nav">
+
+        <a href="#leadtime">
+            <span class="nav-icon">↗</span>
+            <span>Lead Time</span>
+        </a>
+
+        <a href="#heatmap">
+            <span class="nav-icon">▦</span>
+            <span>Heatmap</span>
+        </a>
+
+        <a href="#data">
+            <span class="nav-icon">⇩</span>
+            <span>Data Sources</span>
+        </a>
+
+    </nav>
+
+
+    <div class="nav-title">
+        SYSTEM
+    </div>
+
+    <nav class="nav">
+
+        <a href="#methodology">
+            <span class="nav-icon">◎</span>
+            <span>Methodology</span>
+        </a>
+
+        <a href="#api">
+            <span class="nav-icon">&lt;/&gt;</span>
+            <span>API</span>
+        </a>
+
+    </nav>
+
+
+    <div class="sidebar-footer">
+
+        <small>
+            LAST REFRESH
+        </small>
+
+        <strong id="clock">
+            Loading...
+        </strong>
+
+    </div>
+
+</aside>
+
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="main" id="dashboard">
+
+
+<header class="topbar">
+
+    <div>
+
+        <div class="breadcrumb">
+            INDIA / STATISTICAL INTELLIGENCE / AIRFARE
+        </div>
+
+        <h1>
+            Real-Time Airfare Price Index
+        </h1>
+
+    </div>
+
+
+    <div class="top-actions">
+
+        <div class="live-badge">
+            ● MONITORING ACTIVE
+        </div>
+
+        <button
+            class="refresh-btn"
+            onclick="refreshIndex()">
+
+            ↻ Refresh
+
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="hero reveal">
+
+
+    <div class="flight-path">
+
+        <svg viewBox="0 0 500 230">
+
+            <path
+                class="path-line"
+                d="M20 190 C120 40, 230 210, 340 70 S450 80, 490 25"
+            />
+
+            <circle
+                cx="20"
+                cy="190"
+                r="4"
+                fill="#d4af37"
+            />
+
+            <circle
+                cx="490"
+                cy="25"
+                r="4"
+                fill="#f4d76b"
+            />
+
+        </svg>
+
+    </div>
+
+
+    <div class="plane">
+        ✈
+    </div>
+
+    <div class="runway"></div>
+
+
+    <div class="hero-content">
+
+        <div class="hero-label">
+            REAL-TIME AIRFARE PRICE INDEX
+        </div>
+
+        <h2>
+            Measuring the
+            <span>price movement</span>
+            of Indian air travel.
+        </h2>
+
+        <p>
+
+            A statistical intelligence platform designed
+            to continuously collect, clean, normalise and
+            aggregate domestic airfare observations across
+            airlines and online travel aggregators.
+
+            <br><br>
+
+            Built as a prototype for augmentation of
+            Consumer Price Index airfare measurement.
+
+        </p>
+
+
+        <div class="hero-buttons">
+
+            <a href="#index">
+                <button class="gold-btn">
+                    Explore Index →
+                </button>
+            </a>
+
+            <a href="#methodology">
+                <button class="dark-btn">
+                    Methodology
+                </button>
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <div class="hero-index">
+
+        <small>
+            CURRENT INDEX
+        </small>
+
+        <div
+            class="big-index"
+            id="heroIndex">
+
+            127.84
+
+        </div>
+
+        <div class="index-change">
+            ▲ 3.42% vs previous period
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     KPI CARDS
+========================================================= -->
+
+<section class="kpis reveal">
+
+    <div class="kpi">
+
+        <div class="kpi-label">
+            CURRENT INDEX
+        </div>
+
+        <div class="kpi-value">
+            127.84
+        </div>
+
+        <div class="kpi-sub">
+            Base year: 2024 = 100
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-label">
+            MONTHLY CHANGE
+        </div>
+
+        <div class="kpi-value">
+            +2.81%
+        </div>
+
+        <div class="kpi-sub">
+            Month-on-month
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-label">
+            ANNUAL CHANGE
+        </div>
+
+        <div class="kpi-value">
+            +7.46%
+        </div>
+
+        <div class="kpi-sub">
+            Year-on-year
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-label">
+            ROUTES
+        </div>
+
+        <div class="kpi-value">
+            42
+        </div>
+
+        <div class="kpi-sub">
+            Representative sectors
+        </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+        <div class="kpi-label">
+            OBSERVATIONS
+        </div>
+
+        <div class="kpi-value">
+            18.6K
+        </div>
+
+        <div class="kpi-sub">
+            Price quotes
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     INDEX
+========================================================= -->
+
+<section class="section grid-2 reveal" id="index">
+
+
+<div class="card index-card">
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="label">
+                CPI-STYLE INDEX
+            </div>
+
+            <h3>
+                Airfare Price Index
+            </h3>
+
+        </div>
+
+        <div class="period">
+            2024 = 100
+        </div>
+
+    </div>
+
+
+    <div class="index-main">
+
+        <div class="circular-index">
+
+            <div class="circular-content">
+
+                <strong>
+                    127.84
+                </strong>
+
+                <span>
+                    CURRENT LEVEL
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="index-details">
+
+            <div class="detail-row">
+                <span>Previous Month</span>
+                <span>124.35</span>
+            </div>
+
+            <div class="detail-row">
+                <span>Monthly Change</span>
+                <span class="gold-text">+2.81%</span>
+            </div>
+
+            <div class="detail-row">
+                <span>Previous Year</span>
+                <span>118.97</span>
+            </div>
+
+            <div class="detail-row">
+                <span>Annual Change</span>
+                <span class="gold-text">+7.46%</span>
+            </div>
+
+            <div class="detail-row">
+                <span>Frequency</span>
+                <span>Daily / Monthly</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="label">
+                PRICE MOVEMENT
+            </div>
+
+            <h3>
+                Index Trend
+            </h3>
+
+        </div>
+
+        <div class="period">
+            12 MONTHS
+        </div>
+
+    </div>
+
+
+    <div class="chart">
+
+        <svg
+            viewBox="0 0 700 250"
+            preserveAspectRatio="none">
+
+            <polyline
+                points="
+                0,205
+                60,190
+                120,195
+                180,165
+                240,175
+                300,140
+                360,145
+                420,110
+                480,125
+                540,80
+                600,90
+                660,55
+                700,65
+                "
+                fill="none"
+                stroke="#d4af37"
+                stroke-width="3"
+            />
+
+        </svg>
+
+    </div>
+
+
+    <div class="chart-labels">
+
+        <span>OCT</span>
+        <span>NOV</span>
+        <span>DEC</span>
+        <span>JAN</span>
+        <span>FEB</span>
+        <span>MAR</span>
+        <span>APR</span>
+        <span>MAY</span>
+        <span>JUN</span>
+        <span>JUL</span>
+        <span>AUG</span>
+        <span>SEP</span>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+     MONTHLY
+========================================================= -->
+
+<section class="section grid-2 reveal">
+
+
+<div class="card">
+
+    <div class="label">
+        MONTHLY OBSERVATIONS
+    </div>
+
+    <h3>
+        Airfare Index by Month
+    </h3>
+
+
+    <div class="monthly-row">
+        <div class="month">OCT</div>
+        <div class="month-bar">
+            <div style="width:74%"></div>
+        </div>
+        <div class="month-value">118.2</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">NOV</div>
+        <div class="month-bar">
+            <div style="width:77%"></div>
+        </div>
+        <div class="month-value">119.7</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">DEC</div>
+        <div class="month-bar">
+            <div style="width:82%"></div>
+        </div>
+        <div class="month-value">121.4</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">JAN</div>
+        <div class="month-bar">
+            <div style="width:79%"></div>
+        </div>
+        <div class="month-value">120.3</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">FEB</div>
+        <div class="month-bar">
+            <div style="width:85%"></div>
+        </div>
+        <div class="month-value">123.8</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">MAR</div>
+        <div class="month-bar">
+            <div style="width:89%"></div>
+        </div>
+        <div class="month-value">125.6</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">APR</div>
+        <div class="month-bar">
+            <div style="width:91%"></div>
+        </div>
+        <div class="month-value">126.7</div>
+    </div>
+
+    <div class="monthly-row">
+        <div class="month">SEP</div>
+        <div class="month-bar">
+            <div style="width:100%"></div>
+        </div>
+        <div class="month-value">127.84</div>
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="label">
+        INDEX INTERPRETATION
+    </div>
+
+    <h3>
+        Understanding the Index
+    </h3>
+
+    <p style="
+        color:#666;
+        font-size:9px;
+        line-height:1.8;
+        margin-top:20px;
+    ">
+
+        With a base period of 2024 = 100,
+        an index level of 127.84 represents
+        a higher aggregate airfare price level
+        compared with the selected base period.
+
+        <br><br>
+
+        The index is designed to capture
+        movements in comparable airfare
+        observations instead of simply reporting
+        the cheapest ticket available.
+
+    </p>
+
+    <div style="
+        margin-top:25px;
+        padding:15px;
+        border-left:2px solid #d4af37;
+        background:rgba(212,175,55,.035);
+        color:#777;
+        font-size:8px;
+        line-height:1.7;
+    ">
+
+        <strong style="color:#d4af37;">
+            Prototype
+        </strong>
+
+        <br>
+
+        Demonstration values are used in this
+        interface and should be replaced by
+        validated production data.
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ROUTES
+========================================================= -->
+
+<section class="section card reveal" id="routes">
+
+    <div class="card-header">
+
+        <div>
+
+            <div class="label">
+                ROUTE MONITORING
+            </div>
+
+            <h3>
+                Representative Domestic Sectors
+            </h3>
+
+        </div>
+
+        <div class="period">
+            PROTOTYPE
+        </div>
+
+    </div>
+
+
+    <div class="route-grid">
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">DEL → BOM</span>
+                <span class="up">▲ 8.2%</span>
+            </div>
+
+            <div class="route-city">
+                Delhi → Mumbai
+            </div>
+
+            <div class="route-price">
+                ₹5,240
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 132.4</span>
+                <span>T+7</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">DEL → BLR</span>
+                <span class="up">▲ 4.1%</span>
+            </div>
+
+            <div class="route-city">
+                Delhi → Bengaluru
+            </div>
+
+            <div class="route-price">
+                ₹4,890
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 128.7</span>
+                <span>T+7</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">BOM → BLR</span>
+                <span class="down">▼ 2.3%</span>
+            </div>
+
+            <div class="route-city">
+                Mumbai → Bengaluru
+            </div>
+
+            <div class="route-price">
+                ₹3,760
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 116.3</span>
+                <span>T+15</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">DEL → CCU</span>
+                <span class="up">▲ 5.7%</span>
+            </div>
+
+            <div class="route-city">
+                Delhi → Kolkata
+            </div>
+
+            <div class="route-price">
+                ₹4,320
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 124.8</span>
+                <span>T+7</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">BLR → HYD</span>
+                <span class="down">▼ 1.8%</span>
+            </div>
+
+            <div class="route-city">
+                Bengaluru → Hyderabad
+            </div>
+
+            <div class="route-price">
+                ₹2,840
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 111.6</span>
+                <span>T+15</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">MAA → DEL</span>
+                <span class="up">▲ 6.4%</span>
+            </div>
+
+            <div class="route-city">
+                Chennai → Delhi
+            </div>
+
+            <div class="route-price">
+                ₹4,680
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 129.1</span>
+                <span>T+7</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">BLR → BOM</span>
+                <span class="up">▲ 3.2%</span>
+            </div>
+
+            <div class="route-city">
+                Bengaluru → Mumbai
+            </div>
+
+            <div class="route-price">
+                ₹3,940
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 119.8</span>
+                <span>T+30</span>
+            </div>
+
+        </div>
+
+
+        <div class="route">
+
+            <div class="route-top">
+                <span class="route-name">HYD → DEL</span>
+                <span class="up">▲ 4.9%</span>
+            </div>
+
+            <div class="route-city">
+                Hyderabad → Delhi
+            </div>
+
+            <div class="route-price">
+                ₹4,210
+            </div>
+
+            <div class="route-bottom">
+                <span>Index 122.4</span>
+                <span>T+15</span>
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     AIRLINES + LEAD TIME
+========================================================= -->
+
+<section class="section grid-2 reveal" id="airlines">
+
+
+<div class="card">
+
+    <div class="label">
+        AIRLINE COVERAGE
+    </div>
+
+    <h3>
+        Average Fare by Carrier
+    </h3>
+
+
+    <div class="airline-row">
+        <div class="airline-name">IndiGo</div>
+        <div class="airline-track">
+            <div class="airline-fill" style="width:88%"></div>
+        </div>
+        <div class="airline-price">₹4,820</div>
+    </div>
+
+    <div class="airline-row">
+        <div class="airline-name">Air India</div>
+        <div class="airline-track">
+            <div class="airline-fill" style="width:78%"></div>
+        </div>
+        <div class="airline-price">₹5,340</div>
+    </div>
+
+    <div class="airline-row">
+        <div class="airline-name">Air India Express</div>
+        <div class="airline-track">
+            <div class="airline-fill" style="width:67%"></div>
+        </div>
+        <div class="airline-price">₹4,510</div>
+    </div>
+
+    <div class="airline-row">
+        <div class="airline-name">Akasa Air</div>
+        <div class="airline-track">
+            <div class="airline-fill" style="width:59%"></div>
+        </div>
+        <div class="airline-price">₹4,260</div>
+    </div>
+
+    <div class="airline-row">
+        <div class="airline-name">SpiceJet</div>
+        <div class="airline-track">
+            <div class="airline-fill" style="width:64%"></div>
+        </div>
+        <div class="airline-price">₹4,680</div>
+    </div>
+
+</div>
+
+
+
+<div class="card" id="leadtime">
+
+    <div class="label">
+        ADVANCE PURCHASE
+    </div>
+
+    <h3>
+        Lead-Time Elasticity
+    </h3>
+
+
+    <div class="lead-chart">
+
+        <div class="lead-column">
+
+            <div class="lead-bar" style="height:100%">
+                <strong>₹7,840</strong>
+            </div>
+
+            <span>T+1</span>
+
+        </div>
+
+
+        <div class="lead-column">
+
+            <div class="lead-bar" style="height:80%">
+                <strong>₹6,240</strong>
+            </div>
+
+            <span>T+7</span>
+
+        </div>
+
+
+        <div class="lead-column">
+
+            <div class="lead-bar" style="height:69%">
+                <strong>₹5,420</strong>
+            </div>
+
+            <span>T+15</span>
+
+        </div>
+
+
+        <div class="lead-column">
+
+            <div class="lead-bar" style="height:57%">
+                <strong>₹4,680</strong>
+            </div>
+
+            <span>T+30</span>
+
+        </div>
+
+
+        <div class="lead-column">
+
+            <div class="lead-bar" style="height:48%">
+                <strong>₹4,120</strong>
+            </div>
+
+            <span>T+45</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+     HEATMAP
+========================================================= -->
+
+<section class="section grid-2 reveal">
+
+
+<div class="card" id="heatmap">
+
+    <div class="label">
+        ROUTE INTENSITY
+    </div>
+
+    <h3>
+        Domestic Route Heatmap
+    </h3>
+
+
+    <div class="heatmap">
+
+        <div class="heat h5">DEL</div>
+        <div class="heat h3">BOM</div>
+        <div class="heat h6">BLR</div>
+        <div class="heat h4">CCU</div>
+        <div class="heat h2">HYD</div>
+        <div class="heat h3">MAA</div>
+
+        <div class="heat h4">BOM</div>
+        <div class="heat h2">BLR</div>
+        <div class="heat h5">DEL</div>
+        <div class="heat h3">HYD</div>
+        <div class="heat h4">MAA</div>
+        <div class="heat h2">CCU</div>
+
+        <div class="heat h6">BLR</div>
+        <div class="heat h4">DEL</div>
+        <div class="heat h2">BOM</div>
+        <div class="heat h5">HYD</div>
+        <div class="heat h3">MAA</div>
+        <div class="heat h4">CCU</div>
+
+    </div>
+
+</div>
+
+
+
+<div class="card">
+
+    <div class="label">
+        DATA PIPELINE
+    </div>
+
+    <h3>
+        Collection Status
+    </h3>
+
+
+    <div class="pipeline">
+
+        <div class="pipeline-item">
+
+            <div class="pipeline-number">
+                01
+            </div>
+
+            <div class="pipeline-text">
+
+                <strong>
+                    Data Acquisition
+                </strong>
+
+                <p>
+                    Airline and OTA observations
+                </p>
+
+            </div>
+
+            <div class="pipeline-status">
+                ✓
+            </div>
+
+        </div>
+
+
+        <div class="pipeline-line"></div>
+
+
+        <div class="pipeline-item">
+
+            <div class="pipeline-number">
+                02
+            </div>
+
+            <div class="pipeline-text">
+
+                <strong>
+                    Parsing
+                </strong>
+
+                <p>
+                    Extract route and fare fields
+                </p>
+
+            </div>
+
+            <div class="pipeline-status">
+                ✓
+            </div>
+
+        </div>
+
+
+        <div class="pipeline-line"></div>
+
+
+        <div class="pipeline-item">
+
+            <div class="pipeline-number">
+                03
+            </div>
+
+            <div class="pipeline-text">
+
+                <strong>
+                    Cleaning
+                </strong>
+
+                <p>
+                    Remove invalid observations
+                </p>
+
+            </div>
+
+            <div class="pipeline-status">
+                ✓
+            </div>
+
+        </div>
+
+
+        <div class="pipeline-line"></div>
+
+
+        <div class="pipeline-item">
+
+            <div class="pipeline-number">
+                04
+            </div>
+
+            <div class="pipeline-text">
+
+                <strong>
+                    Normalisation
+                </strong>
+
+                <p>
+                    Standardise comparable fares
+                </p>
+
+            </div>
+
+            <div class="pipeline-status">
+                ✓
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- =========================================================
+     OTA SECTION
+========================================================= -->
+
+<section class="section card reveal" id="data">
+
+
+    <div class="label">
+        ONLINE TRAVEL AGGREGATORS
+    </div>
+
+    <h3>
+        OTA Data Sources
+    </h3>
+
+    <p class="source-description">
+
+        Fare observations can be monitored across major
+        online travel platforms to improve route-level
+        price coverage and comparison.
+
+    </p>
+
+
+    <div class="ota-grid">
+
+
+        <!-- MAKE MY TRIP -->
+
+        <div class="ota-card makemytrip">
+
+            <div class="ota-logo">
+
+                <div class="mmt-icon">
+                    MY
+                </div>
+
+                <span>
+                    MakeMyTrip
+                </span>
+
+            </div>
+
+            <div class="ota-type">
+                ONLINE TRAVEL AGGREGATOR
+            </div>
+
+            <div class="ota-status">
+                ● SOURCE
+            </div>
+
+        </div>
+
+
+        <!-- YATRA -->
+
+        <div class="ota-card yatra">
+
+            <div class="ota-logo">
+
+                <div class="yatra-icon">
+                    Y
+                </div>
+
+                <span>
+                    YATRA
+                </span>
+
+            </div>
+
+            <div class="ota-type">
+                ONLINE TRAVEL AGGREGATOR
+            </div>
+
+            <div class="ota-status">
+                ● SOURCE
+            </div>
+
+        </div>
+
+
+        <!-- EASEMYTRIP -->
+
+        <div class="ota-card easemytrip">
+
+            <div class="ota-logo">
+
+                <div class="emt-icon">
+                    E
+                </div>
+
+                <span>
+                    EaseMyTrip
+                </span>
+
+            </div>
+
+            <div class="ota-type">
+                ONLINE TRAVEL AGGREGATOR
+            </div>
+
+            <div class="ota-status">
+                ● SOURCE
+            </div>
+
+        </div>
+
+
+        <!-- CLEARTRIP -->
+
+        <div class="ota-card cleartrip">
+
+            <div class="ota-logo">
+
+                <div class="cleartrip-icon">
+                    ✓
+                </div>
+
+                <span>
+                    cleartrip
+                </span>
+
+            </div>
+
+            <div class="ota-type">
+                ONLINE TRAVEL AGGREGATOR
+            </div>
+
+            <div class="ota-status">
+                ● SOURCE
+            </div>
+
+        </div>
+
+
+        <!-- IXIGO -->
+
+        <div class="ota-card ixigo">
+
+            <div class="ota-logo">
+
+                <div class="ixigo-icon">
+                    ✈
+                </div>
+
+                <span>
+                    ixigo
+                </span>
+
+            </div>
+
+            <div class="ota-type">
+                ONLINE TRAVEL AGGREGATOR
+            </div>
+
+            <div class="ota-status">
+                ● SOURCE
+            </div>
+
+        </div>
+
+
+        <!-- GOIBIBO -->
+
+        <div class="ota-card goibibo">
+
+            <div class="ota-logo">
+
+                <div class="goibibo-icon">
+                    go
+                </div>
+
+                <span>
+                    goibibo
+                </span>
+
+            </div>
+
+            <div class="ota-type">
+                ONLINE TRAVEL AGGREGATOR
+            </div>
+
+            <div class="ota-status">
+                ● SOURCE
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     METHODOLOGY
+========================================================= -->
+
+<section class="section card reveal" id="methodology">
+
+
+    <div class="label">
+        STATISTICAL METHODOLOGY
+    </div>
+
+    <h3>
+        From Flight Search to Airfare Index
+    </h3>
+
+
+    <div class="method-grid">
+
+
+        <div class="method">
+
+            <div class="method-num">
+                01
+            </div>
+
+            <h4>
+                Route Selection
+            </h4>
+
+            <p>
+                Select representative domestic
+                city-pairs using traffic and
+                coverage considerations.
+            </p>
+
+        </div>
+
+
+        <div class="method">
+
+            <div class="method-num">
+                02
+            </div>
+
+            <h4>
+                Fare Collection
+            </h4>
+
+            <p>
+                Collect comparable observations
+                across airlines and OTAs.
+            </p>
+
+        </div>
+
+
+        <div class="method">
+
+            <div class="method-num">
+                03
+            </div>
+
+            <h4>
+                Cleaning
+            </h4>
+
+            <p>
+                Detect duplicate, missing,
+                anomalous and unavailable fares.
+            </p>
+
+        </div>
+
+
+        <div class="method">
+
+            <div class="method-num">
+                04
+            </div>
+
+            <h4>
+                Normalisation
+            </h4>
+
+            <p>
+                Standardise fare components,
+                route definitions and timing.
+            </p>
+
+        </div>
+
+
+        <div class="method">
+
+            <div class="method-num">
+                05
+            </div>
+
+            <h4>
+                Aggregation
+            </h4>
+
+            <p>
+                Apply representative weights
+                to calculate index values.
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div style="
+        margin-top:25px;
+        padding:20px;
+        border:1px solid #292929;
+        border-radius:7px;
+        background:#080808;
+    ">
+
+        <div class="label">
+            CONCEPTUAL INDEX FORMULA
+        </div>
+
+        <div style="
+            color:#aaa;
+            font-family:monospace;
+            margin-top:12px;
+            font-size:12px;
+        ">
+
+            Airfare Index =
+            Σ (Route Price Relative × Route Weight)
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     API
+========================================================= -->
+
+<section class="section card reveal" id="api">
+
+    <div class="label">
+        MACHINE-READABLE DATA
+    </div>
+
+    <h3>
+        AirIndex API
+    </h3>
+
+    <div class="api">
+
+        <span class="api-method">
+            GET
+        </span>
+
+        /api/v1/airfare-index
+
+        <br><br>
+
+        {
+
+        <br>
+
+        &nbsp;&nbsp;
+        <span class="api-key">
+            "index"
+        </span>:
+
+        <span class="api-value">
+            127.84
+        </span>,
+
+        <br>
+
+        &nbsp;&nbsp;
+        <span class="api-key">
+            "base_year"
+        </span>:
+
+        <span class="api-value">
+            "2024"
+        </span>,
+
+        <br>
+
+        &nbsp;&nbsp;
+        <span class="api-key">
+            "monthly_change"
+        </span>:
+
+        <span class="api-value">
+            2.81
+        </span>,
+
+        <br>
+
+        &nbsp;&nbsp;
+        <span class="api-key">
+            "annual_change"
+        </span>:
+
+        <span class="api-value">
+            7.46
+        </span>,
+
+        <br>
+
+        &nbsp;&nbsp;
+        <span class="api-key">
+            "routes"
+        </span>:
+
+        <span class="api-value">
+            42
+        </span>
+
+        <br>
+
+        }
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="footer">
+
+    <div>
+        <strong>AIRINDEX INDIA</strong>
+        — Real-Time Airfare Price Intelligence
+    </div>
+
+    <div>
+        SIH Airfare Price Index Prototype
+    </div>
+
+</footer>
+
+
+</main>
+
+
+
+<script>
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+function updateClock(){
+
+    const now = new Date();
+
+    const time =
+        now.toLocaleTimeString(
+            "en-IN",
+            {
+                hour:"2-digit",
+                minute:"2-digit",
+                second:"2-digit"
+            }
+        );
+
+    document.getElementById("clock").innerText =
+        "Today, " + time + " IST";
+}
+
+updateClock();
+
+setInterval(updateClock,1000);
+
+
+/* =========================================================
+   REFRESH INDEX
+========================================================= */
+
+function refreshIndex(){
+
+    const element =
+        document.getElementById("heroIndex");
+
+    element.style.transform =
+        "scale(.75)";
+
+    element.style.opacity =
+        ".3";
+
+    setTimeout(function(){
+
+        const variation =
+            Math.random() * 2 - 1;
+
+        const value =
+            (127.84 + variation).toFixed(2);
+
+        element.innerText =
+            value;
+
+        element.style.transform =
+            "scale(1)";
+
+        element.style.opacity =
+            "1";
+
+    },500);
+}
+
+
+/* =========================================================
+   SCROLL REVEAL
+========================================================= */
+
+const observer =
+    new IntersectionObserver(
+        function(entries){
+
+            entries.forEach(function(entry){
+
+                if(entry.isIntersecting){
+
+                    entry.target
+                        .classList
+                        .add("show");
+
+                }
+
+            });
+
+        },
+        {
+            threshold:.12
+        }
+    );
+
+
+document
+    .querySelectorAll(".reveal")
+    .forEach(function(element){
+
+        observer.observe(element);
+
+    });
+
+
+/* =========================================================
+   NAVIGATION ACTIVE STATE
+========================================================= */
+
+const links =
+    document.querySelectorAll(".nav a");
+
+links.forEach(function(link){
+
+    link.addEventListener(
+        "click",
+        function(){
+
+            links.forEach(function(item){
+
+                item.classList
+                    .remove("active");
+
+            });
+
+            link.classList
+                .add("active");
+
+        }
+    );
+
+});
+
+</script>
+
+</body>
+</html>
